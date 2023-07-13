@@ -1,0 +1,8 @@
+openapi: 3.0.3
+info:
+  title: Backend for Stellar Burgers Project
+  version: 1.0.0
+  description: This is Api for Stellar Burgers Project(desktop application for ordering burgers by registered users)
+
+
+
