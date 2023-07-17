@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { type } from 'os';
-import { TIngredient, TIngredientsData } from 'types/types';
+import { TIngredient } from 'types/types';
 
 const ingredientSchema: Schema = new Schema<TIngredient>({
   name: {
@@ -41,12 +41,4 @@ const ingredientSchema: Schema = new Schema<TIngredient>({
   }
 });
 
-const ingredientsDataSchema = new Schema<TIngredientsData>({
-  data: [ingredientSchema],
-  success: {
-    type: Boolean,
-    default: true
-  }
-});
-
-export const IngredientsData = model('Ingredient', ingredientsDataSchema);
+export default model<TIngredient>('ingredient', ingredientSchema);

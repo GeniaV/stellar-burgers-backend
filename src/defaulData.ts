@@ -1,4 +1,4 @@
-import { IngredientsData } from "./models/ingredient";
+import Ingredient from "./models/ingredient";
 
 const ingredient_one = {
   name: 'Crater Roll N-200i',
@@ -195,24 +195,45 @@ const ingredient_fifteen = {
   image_large: 'https://code.s3.yandex.net/react/code/cheese-large.png',
 };
 
+export async function createDefaultIngredientsData() {
 
-export const ingredientData = new IngredientsData({
-  data: [
-    ingredient_one,
-    ingredient_two,
-    ingredient_three,
-    ingredient_four,
-    ingredient_five,
-    ingredient_six,
-    ingredient_seven,
-    ingredient_eight,
-    ingredient_nine,
-    ingredient_ten,
-    ingredient_eleven,
-    ingredient_twelve,
-    ingredient_thirteen,
-    ingredient_fourteen,
-    ingredient_fifteen
-  ],
-});
+  const existingData = await Ingredient.findOne();
+
+  if (existingData) {
+    console.log('Ingredient copy did not created, data already exists');
+    return;
+  }
+
+  const ingredientOne = new Ingredient(ingredient_one);
+  const ingredientTwo = new Ingredient(ingredient_two);
+  const ingredientThree = new Ingredient(ingredient_three);
+  const ingredientFour = new Ingredient(ingredient_four);
+  const ingredientFive = new Ingredient(ingredient_five);
+  const ingredientSix = new Ingredient(ingredient_six);
+  const ingredientSeven = new Ingredient(ingredient_seven);
+  const ingredientEight = new Ingredient(ingredient_eight);
+  const ingredientNine = new Ingredient(ingredient_nine);
+  const ingredientTen = new Ingredient(ingredient_ten);
+  const ingredientEleven = new Ingredient(ingredient_eleven);
+  const ingredientTwelve = new Ingredient(ingredient_twelve);
+  const ingredientThirteen = new Ingredient(ingredient_thirteen);
+  const ingredientFourteen = new Ingredient(ingredient_fourteen);
+  const ingredientFifteen = new Ingredient(ingredient_fifteen);
+
+  ingredientOne.save();
+  ingredientTwo.save();
+  ingredientThree.save();
+  ingredientFour.save();
+  ingredientFive.save();
+  ingredientSix.save();
+  ingredientSeven.save();
+  ingredientEight.save();
+  ingredientNine.save();
+  ingredientTen.save();
+  ingredientEleven.save();
+  ingredientTwelve.save();
+  ingredientThirteen.save();
+  ingredientFourteen.save();
+  ingredientFifteen.save();
+}
 

@@ -8,7 +8,4 @@ const {
   DB_URL = 'mongodb://127.0.0.1:27017/stellarburgerdb',
 } = process.env;
 
-export {
-  PORT,
-  DB_URL,
-};
+export {  PORT, DB_URL };
