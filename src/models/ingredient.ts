@@ -1,11 +1,13 @@
 import { model, Schema } from 'mongoose';
-import { type } from 'os';
 import { TIngredient } from 'types/types';
 
 const ingredientSchema: Schema = new Schema<TIngredient>({
   name: {
     type: String,
     required: true,
+  },
+  type: {
+    type: String,
   },
   proteins: {
     type: Number,

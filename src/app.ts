@@ -4,8 +4,11 @@ import { PORT, DB_URL } from './config';
 import { createDefaultIngredientsData } from './defaulData';
 import ingredientsRouter from './routes/ingredients';
 import errorHandler from './middlewares/errors';
+import accessControlAllowMiddlware from './middlewares/cors';
 
 const app = express();
+
+app.use(accessControlAllowMiddlware);
 
 app.use(express.json());
 
