@@ -8,15 +8,19 @@ const allowedCors = [
 
 const accessControlAllowMiddlware = (req: Request, res: Response, next: NextFunction) => {
   const { origin } = req.headers;
+  const accessControlRequestHeaders = req.headers['access-control-request-headers'];
 
   if (origin && allowedCors.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
+    res.header('Content-type', 'application/json; charset=UTF-8');
     res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, PATCH, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, ' + accessControlRequestHeaders);
     res.header('Access-Control-Allow-Credentials', 'true');
   }
 
   if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, ' + accessControlRequestHeaders);
     res.sendStatus(StatusCodes.OK);
   } else {
     next();

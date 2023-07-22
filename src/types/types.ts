@@ -16,3 +16,8 @@ export type TUser = {
   email: string,
   password: string
 };
+
+export interface CustomError {
+  code?: number;
+  name?: string;
+};
