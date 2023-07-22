@@ -10,3 +10,9 @@ export type TIngredient = {
   image_mobile: string;
   image_large: string;
 };
+
+export type TUser = {
+  name: string,
+  email: string,
+  password: string
+};
