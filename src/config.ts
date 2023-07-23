@@ -6,6 +6,8 @@ require('dotenv').config({ path: join(__dirname, '..', '..', '.env')});
 const {
   PORT = 4000,
   DB_URL = 'mongodb://127.0.0.1:27017/stellarburgerdb',
+  ACCESS_TOKEN_SECRET,
+  REFRESH_TOKEN_SECRET
 } = process.env;
 
-export {  PORT, DB_URL };
+export {  PORT, DB_URL, ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET };

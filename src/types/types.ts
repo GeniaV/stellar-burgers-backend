@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 export type TIngredient = {
   name: string,
   type: 'bun' | 'main' | 'sauce',
@@ -12,6 +14,7 @@ export type TIngredient = {
 };
 
 export type TUser = {
+  _id?: mongoose.Types.ObjectId,
   name: string,
   email: string,
   password: string
