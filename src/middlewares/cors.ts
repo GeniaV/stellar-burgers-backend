@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { StatusCodes } from '../constants';
 
 const allowedCors = [
   'http://localhost:3000',
@@ -21,7 +20,7 @@ const accessControlAllowMiddlware = (req: Request, res: Response, next: NextFunc
   if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, ' + accessControlRequestHeaders);
-    res.sendStatus(StatusCodes.OK);
+    res.sendStatus(200);
   } else {
     next();
   }

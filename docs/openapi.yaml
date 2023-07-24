@@ -2,7 +2,52 @@ openapi: 3.0.3
 info:
   title: Backend for Stellar Burgers Project
   version: 1.0.0
-  description: This is Api for Stellar Burgers Project(desktop application for ordering burgers by registered users)
-
+  description: This is Api for Stellar Burgers Project (desktop application for ordering burgers by registered users)
+paths:
+  /ingredients:
+    get:
+      summary: Get a list of ingredients
+      description: Get a list of all available ingredients for Stellar Burgers.
+      responses:
+        "200":
+          description: A successful response with a list of ingredients.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful.
+                  data:
+                    type: array
+                    description: An array containing the list of ingredients.
+                    items:
+                      $ref: "#/components/schemas/Ingredient"
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        proteins:
+          type: number
+        fat:
+          type: number
+        carbohydrates:
+          type: number
+        calories:
+          type: number
+        price:
+          type: number
+        image:
+          type: string
+        image_mobile:
+          type: string
+        image_large:
+          type: string
 
 

@@ -3,12 +3,16 @@ import User from '../models/user';
 import { CustomError, TUser } from '../types/types';
 import ConflictError from '../errors/conflict_error';
 import BadRequestError from '../errors/bad_request_error';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../config';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, JWT_SECRET } from '../config';
+import UnauthorizedError from '../errors/unauthorized_error';
+import { ObjectId } from 'mongoose';
+import NotFoundError from '../errors/not_found_error';
 
 const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken');
 
+// Sign up
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body;
 
@@ -34,5 +38,44 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         next(new BadRequestError('Incorrect data provided when creating a user'));
       }
       next(err);
+    });
+};
+
+// Get user
+export const getUserInfo = (req: Request, res: Response, next: NextFunction) => {
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    throw new UnauthorizedError('User is not authorized');
+  }
+
+  const token = authorization.replace('Bearer ', '');
+
+  let payload;
+
+  try {
+    payload = jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    throw new UnauthorizedError('User is not authorized');
+  }
+
+  req.user = payload;
+
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('User not found'));
+      }
+      return res.send({
+        success: true,
+        user: { email: user?.email, name: user?.name }
+      });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new NotFoundError('User with the specified _id not found'));
+      } else {
+        next(err);
+      }
     });
 };
