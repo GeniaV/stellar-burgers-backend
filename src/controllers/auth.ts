@@ -3,10 +3,10 @@ import User from '../models/user';
 import { CustomError, TUser } from '../types/types';
 import ConflictError from '../errors/conflict_error';
 import BadRequestError from '../errors/bad_request_error';
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, JWT_SECRET } from '../config';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../config';
 import UnauthorizedError from '../errors/unauthorized_error';
-import { ObjectId } from 'mongoose';
 import NotFoundError from '../errors/not_found_error';
+import { EXPIRED_TOKEN_MS } from '../constants';
 
 const bcrypt = require('bcrypt');
 
@@ -54,17 +54,17 @@ export const getUserInfo = (req: Request, res: Response, next: NextFunction) => 
   let payload;
 
   try {
-    payload = jwt.verify(token, JWT_SECRET);
+    payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
   } catch (err) {
     throw new UnauthorizedError('User is not authorized');
   }
 
   req.user = payload;
 
-  User.findById(req.user._id)
+  User.findById(req.user.userId)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('User not found'));
+        return next(new NotFoundError('User not found'));
       }
       return res.send({
         success: true,
@@ -78,4 +78,26 @@ export const getUserInfo = (req: Request, res: Response, next: NextFunction) => 
         next(err);
       }
     });
+};
+
+// Sign in
+export const login = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const accessToken = jwt.sign({ userId: user._id }, ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+      const refreshToken = jwt.sign({ userId: user._id }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+      res.cookie('jwt', accessToken, {
+        maxAge: EXPIRED_TOKEN_MS,
+        httpOnly: true,
+        sameSite: true,
+      });
+      res.send({
+        accessToken: `Bearer ${accessToken}`,
+        refreshToken,
+        success: true,
+        user: { email: user.email, name: user.name }
+      });
+    })
+    .catch(next);
 };

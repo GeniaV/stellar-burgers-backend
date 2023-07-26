@@ -12,7 +12,7 @@ interface IUserModel extends Model<TUser> {
   findUserByCredentials: (
     email: string,
     password: string
-  ) => Promise<Document<TUser>>;
+  ) => Promise<TUser>;
 }
 
 const userSchema = new Schema<TUser, IUserModel>({
