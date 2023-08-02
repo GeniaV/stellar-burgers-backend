@@ -43,24 +43,6 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 
 // Get user
 export const getUserInfo = (req: Request, res: Response, next: NextFunction) => {
-  const { authorization } = req.headers;
-
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    throw new UnauthorizedError('User is not authorized');
-  }
-
-  const token = authorization.replace('Bearer ', '');
-
-  let payload;
-
-  try {
-    payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
-  } catch (err) {
-    throw new UnauthorizedError('User is not authorized');
-  }
-
-  req.user = payload;
-
   User.findById(req.user.userId)
     .then((user) => {
       if (!user) {
@@ -100,4 +82,24 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       });
     })
     .catch(next);
+};
+
+// Logout User
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
+  const { token } = req.body;
+
+  try {
+    const user = await User.findOneAndDelete({ token })
+    if (!user) {
+      next(new NotFoundError('User is not found'));
+    }
+
+    res.send({
+      message: "Successful logout",
+      success: true
+    });
+  }
+  catch (err) {
+    next(err);
+  }
 };
