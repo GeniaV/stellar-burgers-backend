@@ -2,16 +2,21 @@ import {
   model,
   Schema,
   Model,
-  Document,
+  ObjectId,
 } from 'mongoose';
 import isEmail from 'validator/lib/isEmail';
 import UnauthorizedError from '../errors/unauthorized_error';
 import { TUser } from '../types/types';
+import NotFoundError from '../errors/not_found_error';
 
 interface IUserModel extends Model<TUser> {
   findUserByCredentials: (
     email: string,
     password: string
+  ) => Promise<TUser>;
+  findUserAndUpdateById: (
+    userId: ObjectId,
+    params: { email?: string, password?: string, name?: string }
   ) => Promise<TUser>;
 }
 
@@ -52,6 +57,34 @@ userSchema.static('findUserByCredentials', function findUserByCredentials(email:
           }
           return user;
         });
+    });
+});
+
+userSchema.static('findUserAndUpdateById', async function findUserAndUpdateById(
+  userId: ObjectId,
+  params: { email?: string, password?: string, name?: string },
+) {
+
+  const user = await this.findById(userId);
+
+  if (!user) {
+    throw new NotFoundError('User is not found');
+  }
+
+  params.password = (params.password || params.password !== '')
+    ? await bcrypt.hash(params.password, 10)
+    : user.password;
+
+  return this.findByIdAndUpdate(
+    userId,
+    params,
+    { new: true, runValidators: true },
+  )
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+      return user;
     });
 });
 

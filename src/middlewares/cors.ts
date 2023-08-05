@@ -18,7 +18,7 @@ const accessControlAllowMiddlware = (req: Request, res: Response, next: NextFunc
   }
 
   if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS, PATCH');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, ' + accessControlRequestHeaders);
     res.sendStatus(200);
   } else {

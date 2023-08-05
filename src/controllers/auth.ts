@@ -86,14 +86,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 
 // Logout User
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
-  const { token } = req.body;
-
   try {
-    const user = await User.findOneAndDelete({ token })
-    if (!user) {
-      next(new NotFoundError('User is not found'));
-    }
-
     res.send({
       message: "Successful logout",
       success: true
@@ -102,4 +95,27 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
   catch (err) {
     next(err);
   }
+};
+
+// Update UserInfo
+export const updateUserInfo = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password, name } = req.body;
+
+  User.findUserAndUpdateById(req.user.userId, { email, password, name })
+    .then((user) => res.send({
+      success: true,
+      user: {
+        name: user.name,
+        email: user.email,
+      }
+    }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Invalid data passed when updating profile'));
+      }
+      if (err.name === 'CastError') {
+        next(new NotFoundError('User is not found'));
+      }
+      next(err);
+    });
 };
