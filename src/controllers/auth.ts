@@ -4,9 +4,13 @@ import { CustomError, TUser } from '../types/types';
 import ConflictError from '../errors/conflict_error';
 import BadRequestError from '../errors/bad_request_error';
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../config';
-import UnauthorizedError from '../errors/unauthorized_error';
 import NotFoundError from '../errors/not_found_error';
 import { EXPIRED_TOKEN_MS } from '../constants';
+import { TestAccount } from 'nodemailer';
+
+const { v4: uuidv4 } = require('uuid');
+
+const nodemailer = require("nodemailer");
 
 const bcrypt = require('bcrypt');
 
@@ -119,3 +123,62 @@ export const updateUserInfo = (req: Request, res: Response, next: NextFunction) 
       next(err);
     });
 };
+
+// Forgot password
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return next(new NotFoundError('User not found'));
+    }
+
+    const token = uuidv4();
+
+    user.passwordResetToken = token;
+
+    await user.save();
+
+    await new Promise<void>((resolve, reject) => {
+      nodemailer.createTestAccount(async (err: Error | null, account: TestAccount) => {
+        if (err) {
+          reject(err);
+        }
+
+        console.log('Test account created: %s', account.user);
+        console.log('Password: %s', account.pass);
+
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.ethereal.email',
+          port: 587,
+          auth: {
+            user: account.user,
+            pass: account.pass
+          }
+        });
+
+        const mailOptions = {
+          to: user.email,
+          from: 'passwordreset@example.com',
+          subject: 'Password reset',
+          text: `Your token for password reset: ${token}\n\nCopy this token and paste it into the appropriate field on the website to continue the password reset process.`,
+        };
+
+        transporter.sendMail(mailOptions, (error: Error | null) => {
+          if (error) reject(error);
+          resolve();
+        });
+      });
+    });
+
+    res.send({
+      message: "Reset email sent",
+      success: true
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+

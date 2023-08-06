@@ -17,7 +17,8 @@ export type TUser = {
   _id?: mongoose.Types.ObjectId,
   name: string,
   email: string,
-  password: string
+  password: string,
+  passwordResetToken?: string,
 };
 
 export interface CustomError {

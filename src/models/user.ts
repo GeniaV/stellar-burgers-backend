@@ -40,6 +40,10 @@ const userSchema = new Schema<TUser, IUserModel>({
     required: true,
     select: false,
   },
+  passwordResetToken: {
+    type: String,
+    required: false
+  },
 });
 
 const bcrypt = require('bcrypt');
