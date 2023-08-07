@@ -181,4 +181,28 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
   }
 };
 
+// Reset Password
+export const resetUserPassword = (req: Request, res: Response, next: NextFunction) => {
+  const { password, token } = req.body;
 
+  bcrypt.hash(password, 10)
+    .then(async (hash: string) => {
+      const user = await User.findOneAndUpdate({ passwordResetToken: token }, { $set: { password: hash }, $unset: { passwordResetToken: "" } }, { new: true })
+      if (!user) {
+        return next(new NotFoundError('User not found'));
+      }
+      return res.send({
+        message: "Password successfully reset",
+        success: true
+      });
+    })
+    .catch((err: Error) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Invalid data passed when reser password'));
+      }
+      if (err.name === 'CastError') {
+        next(new NotFoundError('User is not found'));
+      }
+      next(err);
+    });
+}

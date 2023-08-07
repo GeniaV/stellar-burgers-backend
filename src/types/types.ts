@@ -18,7 +18,7 @@ export type TUser = {
   name: string,
   email: string,
   password: string,
-  passwordResetToken?: string,
+  passwordResetToken?: string | null,
 };
 
 export interface CustomError {
