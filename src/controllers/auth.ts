@@ -206,3 +206,20 @@ export const resetUserPassword = (req: Request, res: Response, next: NextFunctio
       next(err);
     });
 }
+
+// Refresh User Token
+export const refreshToken = (req: Request, res: Response, next: NextFunction) => {
+  const accessToken = jwt.sign({ userId: req.user.userId }, ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+  const refreshToken = jwt.sign({ userId: req.user.userId }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+
+  try {
+    res.send({
+      accessToken: `Bearer ${accessToken}`,
+      refreshToken: refreshToken,
+      success: true
+    });
+  }
+  catch (err) {
+    next(err);
+  }
+};
