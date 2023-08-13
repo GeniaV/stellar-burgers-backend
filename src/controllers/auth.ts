@@ -27,7 +27,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user: TUser) => {
       const accessToken = jwt.sign({ userId: user._id, email: user.email }, ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
       const refreshToken = jwt.sign({ userId: user._id, email: user.email }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
-      res.send({
+      res.status(201).send({
         accessToken: `Bearer ${accessToken}`,
         refreshToken,
         success: true,

@@ -2,14 +2,16 @@ openapi: 3.0.3
 info:
   title: Backend for Stellar Burgers Project
   version: 1.0.0
-  description: This is Api for Stellar Burgers Project (desktop application for ordering burgers by registered users)
+  servers:
+    - url: http://localhost:4000
+  description: This is Api for Stellar Burgers Project
 paths:
   /ingredients:
     get:
       summary: Get a list of ingredients
-      description: Get a list of all available ingredients for Stellar Burgers.
+      description: Get a list of all available ingredients for Stellar Burgers
       responses:
-        "200":
+        200:
           description: A successful response with a list of ingredients.
           content:
             application/json:
@@ -18,12 +20,113 @@ paths:
                 properties:
                   success:
                     type: boolean
-                    description: Flag indicating if the request was successful.
+                    description: Flag indicating if the request was successful
                   data:
                     type: array
                     description: An array containing the list of ingredients.
                     items:
                       $ref: "#/components/schemas/Ingredient"
+  /auth/register:
+    post:
+      summary: User Registration
+      description: Registers a new user with the provided details and returns a confirmation message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Desired username
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+      responses:
+        201:
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        400:
+          description: Incorrect data provided when creating a user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Incorrect data provided when creating a user
+        409:
+          description: User has been already exist
+          content:
+            application/json:
+              schema:
+                type: object
+              properties:
+                error:
+                  type: string
+                  example: User has been already exist
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: An unexpected error occurred on the server
+  /auth/login:
+      post:
+        summary: User Login
+        description: Provides user access to their account
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: User's email address
+                  password:
+                    type: string
+                    description: User's password
+        responses:
+          200:
+            description: User successfully log in
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UserResponse'
+          400:
+            description: Incorrect data provided when user log in
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      example: Incorrect data provided when user log in
+          500:
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    error:
+                      type: string
+                      example: An unexpected error occurred on the server
 components:
   schemas:
     Ingredient:
@@ -49,5 +152,32 @@ components:
           type: string
         image_large:
           type: string
+    UserResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: AccessToken
+        refreshTokenn:
+          type: string
+          description: RefreshToken
+        success:
+          type: boolean
+          description: Flag indicating if the request was successful
+        user:
+          type: object
+          properties:
+            email:
+              type: string
+              example: user@example.com
+              description: Email of the user
+            name:
+              type: string
+              example: Genia
+              description: Name of the user
+
+
+
+
 
 
