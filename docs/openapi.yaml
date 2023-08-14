@@ -54,35 +54,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         400:
-          description: Incorrect data provided when creating a user
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Incorrect data provided when creating a user
+          $ref: '#/components/responses/BadRequestError'
         409:
-          description: User has been already exist
-          content:
-            application/json:
-              schema:
-                type: object
-              properties:
-                error:
-                  type: string
-                  example: User has been already exist
+          $ref: '#/components/responses/ConflictError'
         500:
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: An unexpected error occurred on the server
+          $ref: '#/components/responses/InternalServerError'
   /auth/login:
       post:
         summary: User Login
@@ -108,25 +84,34 @@ paths:
                 schema:
                   $ref: '#/components/schemas/UserResponse'
           400:
-            description: Incorrect data provided when user log in
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      example: Incorrect data provided when user log in
+            $ref: '#/components/responses/BadRequestError'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          404:
+            $ref: '#/components/responses/NotFoundError'
           500:
-            description: Internal Server Error
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    error:
-                      type: string
-                      example: An unexpected error occurred on the server
+            $ref: '#/components/responses/InternalServerError'
+  /auth/user:
+    get:
+      summary: Get user information
+      description: Returns information about the currently authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
 components:
   schemas:
     Ingredient:
@@ -175,9 +160,76 @@ components:
               type: string
               example: Genia
               description: Name of the user
-
-
-
-
-
-
+    UserInfo:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Flag indicating if the request was successful
+        user:
+          type: object
+          properties:
+            email:
+              type: string
+              example: user@example.com
+              description: Email of the user
+            name:
+              type: string
+              example: Genia
+              description: Name of the user
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: An unexpected error occurred on the server
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequestError:
+      description: Incorrect data provided
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Incorrect data provided
+    ConflictError:
+      description: User has been already exist
+      content:
+        application/json:
+          schema:
+            type: object
+          properties:
+            error:
+              type: string
+              example: User has been already exist
+    NotFoundError:
+      description: User with the specified _id not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: User with the specified _id not found
