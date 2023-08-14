@@ -112,6 +112,178 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       tags:
         - Authentication
+    patch:
+      summary: Update user informtion
+      description: Returns updated information about the currently authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Desired username
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
+  /auth/logout:
+    post:
+      summary: Log out
+      description: User log out route
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Successful logout
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
+  /password-reset:
+    post:
+      summary: Forget password
+      description: Provides the user with the ability to recover the password via email if it is forgotten
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User's email address
+      responses:
+        200:
+          description: User successfully send his email address to reset the password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Reset email sent
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /password-reset/reset:
+    post:
+      summary: Reset password
+      description: Provides the creation of a new password, based on the code sent to the user's email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: User's password
+                token:
+                  type: string
+                  description: Verification code
+      responses:
+        200:
+          description: User successfully changed password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Password successfully reset
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /auth/token:
+    post:
+      summary: Refresh access token
+      description: Provides the update of the access token if it has expired
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Resfresh token
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: Access token
+                  refreshToken:
+                    type: string
+                    description: Refresh token
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
 components:
   schemas:
     Ingredient:
