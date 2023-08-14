@@ -6,6 +6,8 @@ import ingredientsRouter from './routes/ingredients';
 import errorHandler from './middlewares/errors';
 import accessControlAllowMiddlware from './middlewares/cors';
 import authRouter from './routes/auth';
+import { errors } from 'celebrate';
+import { requestLogger, errorLogger } from './middlewares/logger';
 
 const cookieParser = require('cookie-parser')
 
@@ -27,11 +29,17 @@ async function main() {
 
 main().catch((err) => console.log(err));
 
+app.use(requestLogger);
+
 app.use(cookieParser());
 
 app.use('/', ingredientsRouter);
 
 app.use('/', authRouter);
+
+app.use(errorLogger);
+
+app.use(errors());
 
 app.use(errorHandler);
 
