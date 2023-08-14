@@ -57,7 +57,16 @@ This route is used to ensure that the user does not get logged out of their acco
 
 ## Stack
 
-TypeScript, Node.js, Express, MongoDB, Mongoose, Nodemailer
+- **Language**: TypeScript
+- **Backend**: Node.js, Express
+- **Database**: MongoDB, Mongoose
+- **Email Service**: Nodemailer
+- **Validation**: Joi, Celebrate
+- **Logging**: Winston, express-winston
+- **Authentication**: bcrypt, jsonwebtoken
+- **Utilities**: uuid, validator, cookie-parser
+- **Environment Variables**: dotenv
+- **Documentation**: openapi.yaml
 
 ## Project Setup
 
