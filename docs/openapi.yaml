@@ -2,7 +2,406 @@ openapi: 3.0.3
 info:
   title: Backend for Stellar Burgers Project
   version: 1.0.0
-  description: This is Api for Stellar Burgers Project(desktop application for ordering burgers by registered users)
-
-
-
+  servers:
+    - url: http://localhost:4000
+  description: This is Api for Stellar Burgers Project
+paths:
+  /ingredients:
+    get:
+      summary: Get a list of ingredients
+      description: Get a list of all available ingredients for Stellar Burgers
+      responses:
+        200:
+          description: A successful response with a list of ingredients.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+                  data:
+                    type: array
+                    description: An array containing the list of ingredients.
+                    items:
+                      $ref: "#/components/schemas/Ingredient"
+  /auth/register:
+    post:
+      summary: User Registration
+      description: Registers a new user with the provided details and returns a confirmation message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Desired username
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+      responses:
+        201:
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        409:
+          $ref: '#/components/responses/ConflictError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /auth/login:
+      post:
+        summary: User Login
+        description: Provides user access to their account
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    description: User's email address
+                  password:
+                    type: string
+                    description: User's password
+        responses:
+          200:
+            description: User successfully log in
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UserResponse'
+          400:
+            $ref: '#/components/responses/BadRequestError'
+          401:
+            $ref: '#/components/responses/UnauthorizedError'
+          404:
+            $ref: '#/components/responses/NotFoundError'
+          500:
+            $ref: '#/components/responses/InternalServerError'
+  /auth/user:
+    get:
+      summary: Get user information
+      description: Returns information about the currently authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
+    patch:
+      summary: Update user informtion
+      description: Returns updated information about the currently authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Desired username
+                email:
+                  type: string
+                  description: User's email address
+                password:
+                  type: string
+                  description: User's password
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
+  /auth/logout:
+    post:
+      summary: Log out
+      description: User log out route
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Successful logout
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
+  /password-reset:
+    post:
+      summary: Forget password
+      description: Provides the user with the ability to recover the password via email if it is forgotten
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User's email address
+      responses:
+        200:
+          description: User successfully send his email address to reset the password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Reset email sent
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /password-reset/reset:
+    post:
+      summary: Reset password
+      description: Provides the creation of a new password, based on the code sent to the user's email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: User's password
+                token:
+                  type: string
+                  description: Verification code
+      responses:
+        200:
+          description: User successfully changed password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Password successfully reset
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /auth/token:
+    post:
+      summary: Refresh access token
+      description: Provides the update of the access token if it has expired
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Resfresh token
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: Access token
+                  refreshToken:
+                    type: string
+                    description: Refresh token
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        proteins:
+          type: number
+        fat:
+          type: number
+        carbohydrates:
+          type: number
+        calories:
+          type: number
+        price:
+          type: number
+        image:
+          type: string
+        image_mobile:
+          type: string
+        image_large:
+          type: string
+    UserResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: AccessToken
+        refreshTokenn:
+          type: string
+          description: RefreshToken
+        success:
+          type: boolean
+          description: Flag indicating if the request was successful
+        user:
+          type: object
+          properties:
+            email:
+              type: string
+              example: user@example.com
+              description: Email of the user
+            name:
+              type: string
+              example: Genia
+              description: Name of the user
+    UserInfo:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Flag indicating if the request was successful
+        user:
+          type: object
+          properties:
+            email:
+              type: string
+              example: user@example.com
+              description: Email of the user
+            name:
+              type: string
+              example: Genia
+              description: Name of the user
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: An unexpected error occurred on the server
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+    BadRequestError:
+      description: Incorrect data provided
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Incorrect data provided
+    ConflictError:
+      description: User has been already exist
+      content:
+        application/json:
+          schema:
+            type: object
+          properties:
+            error:
+              type: string
+              example: User has been already exist
+    NotFoundError:
+      description: User with the specified _id not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: User with the specified _id not found
