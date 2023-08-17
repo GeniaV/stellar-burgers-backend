@@ -6,6 +6,7 @@ import ingredientsRouter from './routes/ingredients';
 import errorHandler from './middlewares/errors';
 import accessControlAllowMiddlware from './middlewares/cors';
 import authRouter from './routes/auth';
+import ordersRouter from './routes/orders';
 import { errors } from 'celebrate';
 import { requestLogger, errorLogger } from './middlewares/logger';
 
@@ -36,6 +37,8 @@ app.use(cookieParser());
 app.use('/', ingredientsRouter);
 
 app.use('/', authRouter);
+
+app.use('/', ordersRouter);
 
 app.use(errorLogger);
 

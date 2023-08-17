@@ -1,7 +1,7 @@
 import Ingredient from "./models/ingredient";
 
 const ingredient_one = {
-  name: 'Crater Roll N-200i',
+  name: 'Crater burger N-200i',
   type: 'bun',
   proteins: 80,
   fat: 24,
@@ -92,7 +92,7 @@ const ingredient_seven = {
 };
 
 const ingredient_eight = {
-  name: 'Fluorescent Roll R2-D3',
+  name: 'Fluorescent burger R2-D3',
   type: 'bun',
   proteins: 44,
   fat: 26,

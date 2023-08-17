@@ -18,7 +18,7 @@ interface IUserModel extends Model<TUser> {
     userId: ObjectId,
     params: { email?: string, password?: string, name?: string }
   ) => Promise<TUser>;
-}
+};
 
 const userSchema = new Schema<TUser, IUserModel>({
   name: {
@@ -43,7 +43,13 @@ const userSchema = new Schema<TUser, IUserModel>({
   passwordResetToken: {
     type: String,
     required: false
+  }
+}, {
+  timestamps: {
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   },
+  versionKey: false
 });
 
 const bcrypt = require('bcrypt');

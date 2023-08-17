@@ -284,6 +284,49 @@ paths:
           $ref: '#/components/responses/InternalServerError'
       tags:
         - Authentication
+  /orders:
+    post:
+      summary: Put an order
+      description: Provides the ability to place orders for authorized users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: string
+                  description: An array of strings representing ids
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Order name
+                  success:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+                  order:
+                    type: boolean
+                    description: Flag indicating if the request was successful
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
+        404:
+          $ref: '#/components/responses/NotFoundError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - Authentication
 components:
   schemas:
     Ingredient:
@@ -349,6 +392,37 @@ components:
               type: string
               example: Genia
               description: Name of the user
+    OrderDetails:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Order name
+        number:
+          type: number
+          description: Order number
+        price:
+          type: number
+          description: Order price
+        status:
+          type: string
+          description: Order status
+        owner:
+          type: object
+          properties:
+            email:
+              type: string
+              example: user@example.com
+              description: Email of the user
+            name:
+              type: string
+              example: Genia
+              description: Name of the user
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+          description: An array of ingredients
   securitySchemes:
     BearerAuth:
       type: http

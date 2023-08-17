@@ -1,7 +1,7 @@
-import { model, Schema } from 'mongoose';
+import mongoose, { model, Schema } from 'mongoose';
 import { TIngredient } from 'types/types';
 
-const ingredientSchema: Schema = new Schema<TIngredient>({
+export const ingredientSchema: Schema = new Schema<TIngredient>({
   name: {
     type: String,
     required: true,
@@ -40,7 +40,10 @@ const ingredientSchema: Schema = new Schema<TIngredient>({
   image_large: {
     type: String,
     required: true,
-  }
+  },
+  __v: {
+    type: Number,
+  },
 });
 
 export default model<TIngredient>('ingredient', ingredientSchema);

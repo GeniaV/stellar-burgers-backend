@@ -55,6 +55,12 @@ This route is used for the direct setting of a new password. The client sends a 
 
 This route is used to ensure that the user does not get logged out of their account after the access token's expiration. Upon access token expiry, the client should use the refresh token to obtain a new access token. After a successful request, the server sends an object to the client containing the fields accessToken and refreshToken. The response also includes a success field indicating the successful refresh.
 
+`/orders`
+
+**METHOD:** POST
+
+This route provides authorized users with the ability to create orders in their accounts. In the app, users choose the bun and fillings for the burger and send an array of ingredient IDs to the server. After that, an order is created on the server.
+
 ## Stack
 
 - **Language**: TypeScript
