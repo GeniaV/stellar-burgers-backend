@@ -7,8 +7,7 @@ import { buildOrderName } from '../utils/functions';
 
 export const putAnOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { data } = req.body;
-
+    const { ingredients } = req.body;
     const user = await User.findById(req.user.userId);
 
     if (!user) {
@@ -22,17 +21,17 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
       updatedAt: user.updatedAt
     };
 
-    const ingredientsPromises = data.map((id: string) => Ingredient.findById(id));
-    const ingredients = await Promise.all(ingredientsPromises);
+    const ingredientsPromises = ingredients.map((id: string) => Ingredient.findById(id));
+    const allingredients = await Promise.all(ingredientsPromises);
 
-    const price = ingredients.reduce((total, ing) => total + ing.price, 0);
+    const price = allingredients.reduce((total, ing) => total + ing.price, 0);
 
-    const lastOrder = await Order.find().sort({ 'order.number': -1 }).limit(1);
-    const orderNumber = lastOrder[0]?.number + 1 || 1;
+    const lastOrder = await Order.find().sort({ 'number': -1 }).limit(1);
+    const orderNumber = lastOrder[0].number + 1 || 1;
 
-    const orderName = buildOrderName(ingredients);
+    const orderName = buildOrderName(allingredients);
 
-    if (!ingredients || ingredients.length === 0) {
+    if (!allingredients || allingredients.length === 0) {
       return next(new NotFoundError('Ingredients not found'));
     }
 
@@ -40,10 +39,12 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
       name: orderName,
       number: orderNumber,
       price: price,
-      ingredients: ingredients,
+      ingredients: allingredients,
       owner: owner,
       status: "in process",
     });
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     await order.save();
 
