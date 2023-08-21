@@ -8,6 +8,7 @@ import { buildOrderName } from '../utils/functions';
 export const putAnOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { ingredients } = req.body;
+
     const user = await User.findById(req.user.userId);
 
     if (!user) {
@@ -27,7 +28,7 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
     const price = allingredients.reduce((total, ing) => total + ing.price, 0);
 
     const lastOrder = await Order.find().sort({ 'number': -1 }).limit(1);
-    const orderNumber = lastOrder[0].number + 1 || 1;
+    const orderNumber = lastOrder[0]?.number + 1 || 1;
 
     const orderName = buildOrderName(allingredients);
 
@@ -41,7 +42,7 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
       price: price,
       ingredients: allingredients,
       owner: owner,
-      status: "in process",
+      status: "pending",
     });
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -54,6 +55,7 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
       order: order,
     });
   } catch (error) {
+    console.log(error)
     next(error);
   }
 };

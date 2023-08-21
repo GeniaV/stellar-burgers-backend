@@ -21,7 +21,7 @@ paths:
                   success:
                     type: boolean
                     description: Flag indicating if the request was successful
-                  data:
+                  ingredients:
                     type: array
                     description: An array containing the list of ingredients.
                     items:
