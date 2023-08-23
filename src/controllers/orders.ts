@@ -4,6 +4,7 @@ import Ingredient from '../models/ingredient';
 import Order from '../models/orders';
 import NotFoundError from '../errors/not_found_error';
 import { buildOrderName } from '../utils/functions';
+import { agenda } from '../app';
 
 export const putAnOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -48,6 +49,10 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     await order.save();
+
+    agenda.schedule('in 2 minutes', 'updateOrderStatus', { orderId: order._id });
+
+    await agenda.start();
 
     res.send({
       name: order.name,

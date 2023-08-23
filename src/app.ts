@@ -9,10 +9,32 @@ import authRouter from './routes/auth';
 import ordersRouter from './routes/orders';
 import { errors } from 'celebrate';
 import { requestLogger, errorLogger } from './middlewares/logger';
+import * as WebSocket from "ws"
+import * as url from 'url';
+import { handleOrdersAll, handleOrders } from './controllers/wsOrders';
+import Order from './models/orders';
+import Agenda, { Job } from 'agenda';
 
+const http = require('http')
 const cookieParser = require('cookie-parser')
 
 const app = express();
+
+const server = http.createServer(app)
+
+const wss = new WebSocket.Server({ server });
+
+export const agenda = new Agenda({ db: { address: DB_URL } });
+
+agenda.define('updateOrderStatus', async (job: Job) => {
+  const { orderId } = job.attrs.data;
+
+  const order = await Order.findById(orderId);
+  if (order) {
+    order.status = "done";
+    await order.save();
+  }
+});
 
 app.use(accessControlAllowMiddlware);
 
@@ -40,12 +62,25 @@ app.use('/', authRouter);
 
 app.use('/', ordersRouter);
 
+wss.on('connection', (ws: WebSocket, req) => {
+  const parsedUrl = url.parse(req.url!, true);
+  const token = parsedUrl.query.token as string;
+
+  if (parsedUrl.pathname === '/orders/all') {
+    handleOrdersAll(ws);
+  } else if (parsedUrl.pathname === '/orders') {
+    handleOrders(ws, token);
+  } else {
+    ws.close(1000, 'Unknown route');
+  }
+});
+
 app.use(errorLogger);
 
 app.use(errors());
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
 });
