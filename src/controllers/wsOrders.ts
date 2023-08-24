@@ -1,20 +1,9 @@
 import * as WebSocket from "ws";
 import Order from '../models/orders';
 
-export const handleOrders = (ws: WebSocket, token?: string) => {
-  ws.on('message', (data) => {
-    console.log('New message on /orders: ' + data);
-  });
-  ws.send('Thanks for connecting to /orders');
-};
-
-export const handleOrdersAll = (ws: WebSocket) => {
-  ws.on('message', (data) => {
-    console.log('New message on /orders: ' + data);
-  });
-
-  const sendInitialOrders = () => {
-    Order.aggregate([
+export async function buildOrderResponse() {
+  try {
+    const orders = await Order.aggregate([
       {
         $addFields: {
           ingredients: {
@@ -34,25 +23,33 @@ export const handleOrdersAll = (ws: WebSocket) => {
           owner: 0
         }
       }
-    ])
-      .then((orders) => {
-        const total = orders.length;
-        const totalToday = orders.filter((order) => new Date(order.createdAt).toDateString() === new Date().toDateString()).length;
-        const response = {
-          success: true,
-          total,
-          totalToday,
-          orders: orders,
-        };
+    ]);
 
-        ws.send(JSON.stringify(response));
-      })
-      .catch(err => {
-        ws.send(JSON.stringify({ error: 'An error occurred while fetching orders' }));
-      });
-  };
+    const total = orders.length;
+    const totalToday = orders.filter((order) => new Date(order.createdAt).toDateString() === new Date().toDateString()).length;
+    return {
+      success: true,
+      total,
+      totalToday,
+      orders,
+    };
+  } catch (err) {
+    return { error: 'An error occurred while fetching orders' };
+  }
+}
 
-  sendInitialOrders();
+export const handleOrdersAll = async (ws: WebSocket) => {
+  ws.on('message', (data) => {
+    console.log('New message on /orders: ' + data);
+  });
+
+  const response = await buildOrderResponse();
+  ws.send(JSON.stringify(response));
 };
 
-
+export const handleOrders = (ws: WebSocket, token?: string) => {
+  ws.on('message', (data) => {
+    console.log('New message on /orders: ' + data);
+  });
+  ws.send('Thanks for connecting to /orders');
+};

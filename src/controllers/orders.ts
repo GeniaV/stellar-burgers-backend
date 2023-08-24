@@ -4,7 +4,8 @@ import Ingredient from '../models/ingredient';
 import Order from '../models/orders';
 import NotFoundError from '../errors/not_found_error';
 import { buildOrderName } from '../utils/functions';
-import { agenda } from '../app';
+import { agenda, clients } from '../app';
+import { buildOrderResponse } from '../controllers/wsOrders';
 
 export const putAnOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -50,6 +51,11 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
 
     await order.save();
 
+    const response = await buildOrderResponse();
+    clients.forEach(client => {
+      client.send(JSON.stringify(response));
+    });
+
     agenda.schedule('in 2 minutes', 'updateOrderStatus', { orderId: order._id });
 
     await agenda.start();
@@ -64,4 +70,3 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
-

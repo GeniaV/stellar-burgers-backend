@@ -11,7 +11,7 @@ import { errors } from 'celebrate';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import * as WebSocket from "ws"
 import * as url from 'url';
-import { handleOrdersAll, handleOrders } from './controllers/wsOrders';
+import { handleOrdersAll, handleOrders, buildOrderResponse } from './controllers/wsOrders';
 import Order from './models/orders';
 import Agenda, { Job } from 'agenda';
 
@@ -33,6 +33,11 @@ agenda.define('updateOrderStatus', async (job: Job) => {
   if (order) {
     order.status = "done";
     await order.save();
+
+    const response = await buildOrderResponse();
+    clients.forEach(client => {
+      client.send(JSON.stringify(response));
+    });
   }
 });
 
@@ -62,17 +67,27 @@ app.use('/', authRouter);
 
 app.use('/', ordersRouter);
 
+export const clients: WebSocket[] = [];
+
 wss.on('connection', (ws: WebSocket, req) => {
   const parsedUrl = url.parse(req.url!, true);
   const token = parsedUrl.query.token as string;
 
   if (parsedUrl.pathname === '/orders/all') {
+    clients.push(ws);
     handleOrdersAll(ws);
   } else if (parsedUrl.pathname === '/orders') {
     handleOrders(ws, token);
   } else {
     ws.close(1000, 'Unknown route');
   }
+
+  ws.on('close', () => {
+    const index = clients.indexOf(ws);
+    if (index > -1) {
+      clients.splice(index, 1);
+    }
+  });
 });
 
 app.use(errorLogger);
