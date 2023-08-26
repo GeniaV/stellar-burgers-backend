@@ -64,8 +64,9 @@ This route provides authorized users with the ability to create orders in their 
 ## Stack
 
 - **Language**: TypeScript
-- **Backend**: Node.js, Express
+- **Backend**: Node.js, Express, WebSocket
 - **Database**: MongoDB, Mongoose
+- **Task Scheduling**: Agenda
 - **Email Service**: Nodemailer
 - **Validation**: Joi, Celebrate
 - **Logging**: Winston, express-winston
