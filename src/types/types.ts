@@ -44,5 +44,6 @@ export type TOrderDetails = {
     email: string,
     name: string,
     updatedAt: string,
+    ownerId?: string
   },
 };

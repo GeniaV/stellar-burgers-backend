@@ -24,3 +24,12 @@ export const checkAutMiddlware = (req: Request, res: Response, next: NextFunctio
   req.user = payload;
   return next();
 }
+
+export const getUserIdFromToken = (token: string): string | null => {
+  try {
+    const payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
+    return payload.userId;
+  } catch (error) {
+    return null;
+  }
+}

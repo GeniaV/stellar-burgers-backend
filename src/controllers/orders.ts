@@ -4,7 +4,7 @@ import Ingredient from '../models/ingredient';
 import Order from '../models/orders';
 import NotFoundError from '../errors/not_found_error';
 import { buildOrderName } from '../utils/functions';
-import { agenda, clients } from '../app';
+import { agenda, clients, userClients } from '../app';
 import { buildOrderResponse } from '../controllers/wsOrders';
 
 export const putAnOrder = async (req: Request, res: Response, next: NextFunction) => {
@@ -16,13 +16,6 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
     if (!user) {
       return next(new NotFoundError('User not found'));
     }
-
-    const owner = {
-      createdAt: user.createdAt,
-      email: user.email,
-      name: user.name,
-      updatedAt: user.updatedAt
-    };
 
     const ingredientsPromises = ingredients.map((id: string) => Ingredient.findById(id));
     const allingredients = await Promise.all(ingredientsPromises);
@@ -43,7 +36,13 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
       number: orderNumber,
       price: price,
       ingredients: allingredients,
-      owner: owner,
+      owner: {
+        createdAt: user.createdAt,
+        email: user.email,
+        name: user.name,
+        updatedAt: user.updatedAt,
+        ownerId: user._id
+      },
       status: "pending",
     });
 
@@ -51,19 +50,39 @@ export const putAnOrder = async (req: Request, res: Response, next: NextFunction
 
     await order.save();
 
+    const userWs = userClients.get(order.owner.ownerId!);
+    if (userWs) {
+      const response = await buildOrderResponse(order.owner.ownerId);
+      userWs.send(JSON.stringify(response));
+    }
+
     const response = await buildOrderResponse();
     clients.forEach(client => {
       client.send(JSON.stringify(response));
     });
 
-    agenda.schedule('in 2 minutes', 'updateOrderStatus', { orderId: order._id });
+    agenda.schedule('in 1 minute', 'updateOrderStatus', { orderId: order._id, userId: order.owner.ownerId });
 
     await agenda.start();
+
+    const sendingOrder = {
+      name: orderName,
+      number: orderNumber,
+      price: price,
+      ingredients: allingredients,
+      owner: {
+        createdAt: user.createdAt,
+        email: user.email,
+        name: user.name,
+        updatedAt: user.updatedAt,
+      },
+      status: "pending",
+    };
 
     res.send({
       name: order.name,
       success: true,
-      order: order,
+      order: sendingOrder,
     });
   } catch (error) {
     console.log(error)

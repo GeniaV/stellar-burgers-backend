@@ -14,6 +14,7 @@ import * as url from 'url';
 import { handleOrdersAll, handleOrders, buildOrderResponse } from './controllers/wsOrders';
 import Order from './models/orders';
 import Agenda, { Job } from 'agenda';
+import { getUserIdFromToken } from './middlewares/auth-thunk';
 
 const http = require('http')
 const cookieParser = require('cookie-parser')
@@ -24,20 +25,32 @@ const server = http.createServer(app)
 
 const wss = new WebSocket.Server({ server });
 
+export const clients: WebSocket[] = [];
+
+export const userClients: Map<string, WebSocket> = new Map();
+
 export const agenda = new Agenda({ db: { address: DB_URL } });
 
 agenda.define('updateOrderStatus', async (job: Job) => {
-  const { orderId } = job.attrs.data;
+  const { orderId, userId } = job.attrs.data;
 
   const order = await Order.findById(orderId);
   if (order) {
     order.status = "done";
     await order.save();
 
-    const response = await buildOrderResponse();
+    const responseAll = await buildOrderResponse();
     clients.forEach(client => {
-      client.send(JSON.stringify(response));
+      client.send(JSON.stringify(responseAll));
     });
+
+    if (userId && userClients.has(userId)) {
+      const userWs = userClients.get(userId);
+      if (userWs) {
+        const response = await buildOrderResponse(userId);
+        userWs.send(JSON.stringify(response));
+      }
+    }
   }
 });
 
@@ -67,28 +80,32 @@ app.use('/', authRouter);
 
 app.use('/', ordersRouter);
 
-export const clients: WebSocket[] = [];
-
 wss.on('connection', (ws: WebSocket, req) => {
   const parsedUrl = url.parse(req.url!, true);
   const token = parsedUrl.query.token as string;
+  const userId = getUserIdFromToken(token);
 
   if (parsedUrl.pathname === '/orders/all') {
     clients.push(ws);
     handleOrdersAll(ws);
-  } else if (parsedUrl.pathname === '/orders') {
+  } else if (parsedUrl.pathname === '/orders' && userId) {
+    userClients.set(userId, ws);
     handleOrders(ws, token);
   } else {
     ws.close(1000, 'Unknown route');
   }
 
   ws.on('close', () => {
-    const index = clients.indexOf(ws);
-    if (index > -1) {
-      clients.splice(index, 1);
+    const indexAll = clients.indexOf(ws);
+    if (indexAll > -1) {
+      clients.splice(indexAll, 1);
+    }
+
+    if (userClients.has(userId!)) {
+      userClients.delete(userId!);
     }
   });
-});
+});;
 
 app.use(errorLogger);
 
