@@ -32,25 +32,30 @@ export const userClients: Map<string, WebSocket> = new Map();
 export const agenda = new Agenda({ db: { address: DB_URL } });
 
 agenda.define('updateOrderStatus', async (job: Job) => {
-  const { orderId, userId } = job.attrs.data;
+  try {
+    const { orderId, userId } = job.attrs.data;
 
-  const order = await Order.findById(orderId);
-  if (order) {
-    order.status = "done";
-    await order.save();
+    const order = await Order.findById(orderId);
+    if (order) {
+      order.status = "done";
+      await order.save();
 
-    const responseAll = await buildOrderResponse();
-    clients.forEach(client => {
-      client.send(JSON.stringify(responseAll));
-    });
+      const responseAll = await buildOrderResponse();
+      clients.forEach(client => {
+        client.send(JSON.stringify(responseAll));
+      });
 
-    if (userId && userClients.has(userId)) {
-      const userWs = userClients.get(userId);
-      if (userWs) {
-        const response = await buildOrderResponse(userId);
-        userWs.send(JSON.stringify(response));
+      if (userId && userClients.has(userId)) {
+        const userWs = userClients.get(userId);
+        if (userWs) {
+          const response = await buildOrderResponse(userId);
+          userWs.send(JSON.stringify(response));
+        }
       }
     }
+    await job.remove();
+  } catch (error) {
+    console.error("Error during updateOrderStatus:", error);
   }
 });
 
