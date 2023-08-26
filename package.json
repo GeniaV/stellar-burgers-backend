@@ -28,8 +28,11 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@types/agenda": "^4.1.0",
+    "@types/ws": "^8.5.5",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "agenda": "^5.0.0",
     "bcrypt": "^5.1.0",
     "celebrate": "^15.0.1",
     "cookie-parser": "^1.4.6",
@@ -41,6 +44,7 @@
     "nodemailer": "^6.9.4",
     "uuid": "^9.0.0",
     "validator": "^13.9.0",
-    "winston": "^3.10.0"
+    "winston": "^3.10.0",
+    "ws": "^8.13.0"
   }
 }

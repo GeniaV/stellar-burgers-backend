@@ -27,6 +27,9 @@ const orderDetailsSchema = new Schema<TOrderDetails>({
     updatedAt: {
       type: Date,
     },
+    ownerId: {
+      type: String,
+    }
   },
 },
   {

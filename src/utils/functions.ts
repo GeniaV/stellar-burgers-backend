@@ -5,7 +5,7 @@ export const buildOrderName = (ingredients: TIngredient[]): string => {
   const sauce = [...new Set(ingredients.filter(ing => ing.type === 'sauce').map(ing => ing.name))];
   const main = [...new Set(ingredients.filter(ing => ing.type === 'main').map(ing => ing.name))];
 
-  let name = bun ? bun.name.replace(/ N-\d+| R2-D\d+/g, '') : 'burger';
+  let name = bun ? bun.name.replace(/ N-\d+\w*| R2-D\d+\w*/g, '') : 'burger';
 
   if (main.length > 0 || sauce.length > 0) {
     name += ' with';
