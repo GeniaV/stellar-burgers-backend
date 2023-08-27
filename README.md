@@ -4,6 +4,10 @@ This API is intended for the React Burger frontend application. Previously, the 
 
 ## Description
 
+### HTTP Routes:
+
+In the docs folder, you can find the openapi.yaml file. It provides you with detailed documentation for HTTP requests that you can import into [Postman](https://www.postman.com/) or [Swagger](https://editor.swagger.io/).
+
 `/ingredients`
 
 **METHOD:** GET
@@ -26,9 +30,9 @@ This route is intended for users to log into their account using their email and
 
 **METHODS:** GET, PATCH
 
-When using the GET method, this route is used to retrieve user information. This route has a middleware that checks if the user is authorized, as only authorized users can access this information. Token verification is used for this purpose. The user is searched for in the database based on their ID. Upon successful identification, the client receives a response in the form of an object with success and user fields. The user object includes email and name fields.
+When using the **GET** method, this route is used to retrieve user information. This route has a middleware that checks if the user is authorized, as only authorized users can access this information. Token verification is used for this purpose. The user is searched for in the database based on their ID. Upon successful identification, the client receives a response in the form of an object with success and user fields. The user object includes email and name fields.
 
-When using the PATCH method, this route is used for users to update their own data (email, name, password) in their personal account. This route also has a middleware that checks if the user is authorized, as only authorized users can update their information. Token verification is used for this purpose. After successful update, the client receives a response in the form of an object with success and user fields. The user object includes email and name fields.
+When using the **PATCH** method, this route is used for users to update their own data (email, name, password) in their personal account. This route also has a middleware that checks if the user is authorized, as only authorized users can update their information. Token verification is used for this purpose. After successful update, the client receives a response in the form of an object with success and user fields. The user object includes email and name fields.
 
 `/auth/logout`
 
@@ -60,6 +64,16 @@ This route is used to ensure that the user does not get logged out of their acco
 **METHOD:** POST
 
 This route provides authorized users with the ability to create orders in their accounts. In the app, users choose the bun and fillings for the burger and send an array of ingredient IDs to the server. After that, an order is created on the server.
+
+### Websocket Routes:
+
+`/orders`
+
+Retrieves orders of a specific user. User should be authorized. This route provides real-time updates on orders and their statuses.
+
+`/orders/all`
+
+Retrieves orders of all users. This route provides real-time updates on orders and their statuses. The latest 50 orders are being loaded.
 
 ## Stack
 

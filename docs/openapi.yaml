@@ -2,8 +2,6 @@ openapi: 3.0.3
 info:
   title: Backend for Stellar Burgers Project
   version: 1.0.0
-  servers:
-    - url: http://localhost:4000
   description: This is Api for Stellar Burgers Project
 paths:
   /ingredients:
@@ -465,10 +463,10 @@ components:
         application/json:
           schema:
             type: object
-          properties:
-            error:
-              type: string
-              example: User has been already exist
+            properties:
+              error:
+                type: string
+                example: User has been already exist
     NotFoundError:
       description: User with the specified _id not found
       content:
