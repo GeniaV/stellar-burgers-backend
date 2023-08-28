@@ -6,7 +6,7 @@ This API is intended for the React Burger frontend application. Previously, the 
 
 ### HTTP Routes:
 
-In the docs folder, you can find the openapi.yaml file. It provides you with detailed documentation for HTTP requests that you can import into [Postman](https://www.postman.com/) or [Swagger](https://editor.swagger.io/).
+In the 'docs' folder,, you can find the **openapi.yaml** file. It provides you with detailed documentation for HTTP requests that you can import into [Postman](https://www.postman.com/) or [Swagger](https://editor.swagger.io/).
 
 `/ingredients`
 
@@ -67,6 +67,8 @@ This route provides authorized users with the ability to create orders in their 
 
 ### Websocket Routes:
 
+In the 'docs' folder, you will find the **orders-websocket-api.yaml** file. This file provides documentation for the WebSocket API. You can use [AsyncAPI Studio](https://studio.asyncapi.com/) to view it interactively.
+
 `/orders`
 
 Retrieves orders of a specific user. User should be authorized. This route provides real-time updates on orders and their statuses.
@@ -87,7 +89,7 @@ Retrieves orders of all users. This route provides real-time updates on orders a
 - **Authentication**: bcrypt, jsonwebtoken
 - **Utilities**: uuid, validator, cookie-parser
 - **Environment Variables**: dotenv
-- **Documentation**: openapi.yaml
+- **Documentation**: openapi.yaml, orders-websocket-api.yaml
 
 ## Project Setup
 

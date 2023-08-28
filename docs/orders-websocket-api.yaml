@@ -1,0 +1,119 @@
+asyncapi: 2.6.0
+info:
+  title: Orders WebSocket API
+  version: 1.0.0
+  description: Real-time updates for the orders feed.
+servers:
+  local:
+    url: 'ws://localhost:4000'
+    protocol: ws
+channels:
+  /orders/all:
+    subscribe:
+      summary: Get updates about all orders
+      description: |
+        Subscribe to this channel to receive real-time updates:
+        1) The last 50 orders.
+        2) New orders as they are created.
+        3) Changes in order statuses from 'pending' to 'done'.
+      message:
+        name: all orders
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            success:
+              type: boolean
+              description: Indicates if the operation was successful.
+            total:
+              type: integer
+              description: Total number of orders.
+            totalToday:
+              type: integer
+              description: Total number of orders created today.
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/Order'
+          required:
+            - success
+            - total
+            - orders
+  /orders:
+    bindings:
+      ws:
+        query:
+          type: object
+          properties:
+            token:
+              type: string
+          required:
+            - token
+    subscribe:
+      summary: Get updates about user-specific orders
+      description: |
+        Registered users can subscribe to this channel with their token to see their orders in real-time and their status changes.
+      message:
+        name: user orders
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            success:
+              type: boolean
+              description: Indicates if the operation was successful.
+            total:
+              type: integer
+              description: Total number of user-specific orders.
+            totalToday:
+              type: integer
+              description: Total number of user-specific orders created today.
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/Order'
+          required:
+            - success
+            - total
+            - orders
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the order.
+        name:
+          type: string
+          description: Name or description of the order.
+        number:
+          type: integer
+          description: Order number.
+        status:
+          type: string
+          enum:
+            - pending
+            - done
+          description: Order status.
+        ingredients:
+          type: array
+          items:
+            type: string
+          description: List of ingredient IDs used in the order.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the order was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the order was last updated.
+      required:
+        - _id
+        - name
+        - number
+        - status
+        - ingredients
+        - createdAt
+        - updatedAt
