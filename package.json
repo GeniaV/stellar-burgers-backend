@@ -4,6 +4,7 @@
   "description": "Backend for Stellar Burgers Project",
   "main": "dist/app.js",
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "dev": "ts-node-dev src/app.ts",
     "start": "ts-node src/app.ts",
@@ -23,9 +24,10 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "^2.27.5",
+    "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   },
   "dependencies": {
     "@types/agenda": "^4.1.0",
@@ -42,6 +44,7 @@
     "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.3.4",
     "nodemailer": "^6.9.4",
+    "pm2": "^5.3.0",
     "uuid": "^9.0.0",
     "validator": "^13.9.0",
     "winston": "^3.10.0",

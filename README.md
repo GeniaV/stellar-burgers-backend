@@ -77,7 +77,9 @@ Retrieves orders of a specific user. User should be authorized. This route provi
 
 Retrieves orders of all users. This route provides real-time updates on orders and their statuses. The latest 50 orders are being loaded.
 
-## Stack
+## Tech Stack
+
+### Core
 
 - **Language**: TypeScript
 - **Backend**: Node.js, Express, WebSocket
@@ -87,9 +89,27 @@ Retrieves orders of all users. This route provides real-time updates on orders a
 - **Validation**: Joi, Celebrate
 - **Logging**: Winston, express-winston
 - **Authentication**: bcrypt, jsonwebtoken
-- **Utilities**: uuid, validator, cookie-parser
-- **Environment Variables**: dotenv
-- **Documentation**: openapi.yaml, orders-websocket-api.yaml
+
+### Utilities
+
+- **uuid**
+- **validator**
+- **cookie-parser**
+
+### Environment
+
+- **dotenv**
+
+### Documentation
+
+- **OpenAPI (Swagger)**: openapi.yaml
+- **Websocket API**: orders-websocket-api.yaml
+
+### DevOps & Deployment
+
+- **Containerization**: Docker
+- **Orchestration**: Docker Compose
+- **Process Manager**: PM2
 
 ## Project Setup
 

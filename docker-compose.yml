@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  backend:
+    container_name: 'backend'
+    networks:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    restart: always
+    ports:
+      - '4000:4000'
+    depends_on:
+      - database
+
+  database:
+    container_name: 'database'
+    networks:
+      - db
+    image: mongo:4.4
+    restart: always
+    env_file: .env
+    ports:
+      - '27017:27017'
+
+networks:
+  db:
+    driver: bridge

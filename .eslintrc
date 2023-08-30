@@ -22,14 +22,11 @@
     "import/resolver": {
       "typescript": {
         "alwaysTryTypes": true,
-        "project": "path/to/folder",
-        "project": "packages/*/tsconfig.json",
         "project": [
-          "packages/module-a/tsconfig.json",
-          "packages/module-b/tsconfig.json"
-        ],
-        "project": [
+          "path/to/folder",
           "packages/*/tsconfig.json",
+          "packages/module-a/tsconfig.json",
+          "packages/module-b/tsconfig.json",
           "other-packages/*/tsconfig.json"
         ]
       }

@@ -1,5 +1,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import { errors } from 'celebrate';
+import * as WebSocket from 'ws';
+import * as url from 'url';
+import Agenda, { Job } from 'agenda';
 import { PORT, DB_URL } from './config';
 import { createDefaultIngredientsData } from './defaulData';
 import ingredientsRouter from './routes/ingredients';
@@ -7,21 +11,17 @@ import errorHandler from './middlewares/errors';
 import accessControlAllowMiddlware from './middlewares/cors';
 import authRouter from './routes/auth';
 import ordersRouter from './routes/orders';
-import { errors } from 'celebrate';
 import { requestLogger, errorLogger } from './middlewares/logger';
-import * as WebSocket from "ws"
-import * as url from 'url';
 import { handleOrdersAll, handleOrders, buildOrderResponse } from './controllers/wsOrders';
 import Order from './models/orders';
-import Agenda, { Job } from 'agenda';
 import { getUserIdFromToken } from './middlewares/auth-thunk';
 
-const http = require('http')
-const cookieParser = require('cookie-parser')
+const http = require('http');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
-const server = http.createServer(app)
+const server = http.createServer(app);
 
 const wss = new WebSocket.Server({ server });
 
@@ -37,11 +37,11 @@ agenda.define('updateOrderStatus', async (job: Job) => {
 
     const order = await Order.findById(orderId);
     if (order) {
-      order.status = "done";
+      order.status = 'done';
       await order.save();
 
       const responseAll = await buildOrderResponse();
-      clients.forEach(client => {
+      clients.forEach((client) => {
         client.send(JSON.stringify(responseAll));
       });
 
@@ -55,7 +55,7 @@ agenda.define('updateOrderStatus', async (job: Job) => {
     }
     await job.remove();
   } catch (error) {
-    console.error("Error during updateOrderStatus:", error);
+    console.error('Error during updateOrderStatus:', error);
   }
 });
 
@@ -71,7 +71,7 @@ async function main() {
   createDefaultIngredientsData().catch((err) => {
     console.error(err);
   });
-};
+}
 
 main().catch((err) => console.log(err));
 
@@ -110,7 +110,7 @@ wss.on('connection', (ws: WebSocket, req) => {
       userClients.delete(userId!);
     }
   });
-});;
+});
 
 app.use(errorLogger);
 
@@ -118,6 +118,4 @@ app.use(errors());
 
 app.use(errorHandler);
 
-server.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`)
-});
+server.listen(PORT, '0.0.0.0');
